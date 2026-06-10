@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillPath — Descubre tu carrera ideal</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0ede8;
+    --muted: #888;
+    --accent: #c8f04a;
+    --accent-dark: #a8d030;
+    --info: #4a9eff;
+    --success: #4ade80;
+    --warning: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+  .nav-btn.active { color: var(--text); border-color: rgba(255,255,255,0.25); background: var(--surface); }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* HERO */
+  .hero {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 4rem 2rem 2rem;
+    text-align: center;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--accent);
+    border: 1px solid rgba(200,240,74,0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.5px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero p {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 420px;
+    margin: 0 auto 2.5rem;
+  }
+  .lang-toggle {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .lang-btn {
+    padding: 5px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .lang-btn.active {
+    background: var(--accent);
+    color: #0f0f0f;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* CHAT */
+  .chat-wrap {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+  }
+  .progress-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+  }
+  .prog-dot {
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--surface2);
+    transition: background 0.3s;
+  }
+  .prog-dot.on { background: var(--accent); }
+
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 80px;
+    margin-bottom: 1rem;
+  }
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 14px;
+    max-width: 85%;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .bubble.ai {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    border-radius: 4px 14px 14px 14px;
+  }
+  .bubble.user {
+    background: var(--accent);
+    color: #0f0f0f;
+    align-self: flex-end;
+    font-weight: 500;
+    border-radius: 14px 14px 4px 14px;
+  }
+  .bubble.loading { opacity: 0.5; font-style: italic; }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .input-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .input-row input:focus { border-color: rgba(200,240,74,0.4); }
+  .input-row input::placeholder { color: var(--muted); }
+  .input-row button {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: #0f0f0f;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .input-row button:hover { background: var(--accent-dark); }
+  .input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* RESULTS */
+  .results-wrap {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sector-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 4px;
+  }
+  .sector-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sector-name { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 6px; }
+  .sector-reason { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  .course-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .course-card:hover { border-color: rgba(255,255,255,0.15); }
+  .course-card.top { border-color: rgba(200,240,74,0.3); }
+  .course-card.sponsored { border-left: 3px solid var(--info); border-radius: 0 12px 12px 0; }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+  .badge.free { background: rgba(74,222,128,0.12); color: var(--success); }
+  .badge.sponsored-b { background: rgba(74,158,255,0.12); color: var(--info); }
+  .badge.top-b { background: rgba(200,240,74,0.12); color: var(--accent); }
+  .course-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .course-meta { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .course-earn { font-size: 12px; color: var(--success); margin-bottom: 10px; }
+  .course-link {
+    display: inline-block;
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid rgba(200,240,74,0.25);
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .course-link:hover { background: rgba(200,240,74,0.08); }
+  .restart-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .restart-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* EMPRESAS */
+  .section-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+  }
+  .section-title { font-size: 28px; font-weight: 700; letter-spacing: -0.8px; margin-bottom: 6px; }
+  .section-sub { font-size: 15px; color: var(--muted); margin-bottom: 2rem; }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .stat-val { font-size: 24px; font-weight: 700; color: var(--accent); }
+  .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .plan-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+  .plan-box.featured { border-color: rgba(200,240,74,0.35); }
+  .pop-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(200,240,74,0.12);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .plan-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .plan-price { font-size: 26px; font-weight: 700; letter-spacing: -1px; margin-bottom: 4px; }
+  .plan-price span { font-size: 14px; font-weight: 400; color: var(--muted); }
+  .plan-desc { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+  .feat-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .feat-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--muted); }
+  .feat-item::before { content: "✓"; color: var(--success); font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+  .plan-cta {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .plan-cta:hover { background: var(--surface2); }
+  .plan-cta.main { background: var(--accent); color: #0f0f0f; border-color: var(--accent); font-weight: 600; }
+  .plan-cta.main:hover { background: var(--accent-dark); }
+
+  /* AFILIADOS */
+  .aff-list { display: flex; flex-direction: column; gap: 10px; }
+  .aff-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .aff-name { font-size: 15px; font-weight: 600; }
+  .aff-note { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .aff-pct { font-size: 22px; font-weight: 700; color: var(--success); }
+  .aff-register {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(200,240,74,0.3);
+    background: transparent;
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .aff-register:hover { background: rgba(200,240,74,0.06); }
+  .aff-bottom-note {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 1rem;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 1rem; }
+    .hero { padding: 2.5rem 1rem 1.5rem; }
+    .plans-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Skill<span>Path</span></div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('user', this)">Para ti</button>
+    <button class="nav-btn" onclick="showPage('biz', this)">Academias</button>
+    <button class="nav-btn" onclick="showPage('aff', this)">Afiliados</button>
+  </div>
+</nav>
+
+<!-- PÁGINA USUARIO -->
+<div class="page active" id="page-user">
+  <div class="hero">
+    <div class="hero-tag">IA gratuita · Sin registro</div>
+    <h1>Descubre tu<br><em>carrera ideal</em></h1>
+    <p>Responde 5 preguntas. La IA analiza tus cualidades y te recomienda los cursos exactos para conseguir trabajo en ese sector.</p>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('es', this)">Español</button>
+      <button class="lang-btn" onclick="setLang('en', this)">English</button>
+    </div>
+  </div>
+
+  <div class="chat-wrap">
+    <div class="progress-bar" id="progress">
+      <div class="prog-dot on" id="p0"></div>
+      <div class="prog-dot" id="p1"></div>
+      <div class="prog-dot" id="p2"></div>
+      <div class="prog-dot" id="p3"></div>
+      <div class="prog-dot" id="p4"></div>
+    </div>
+    <div class="chat-area" id="chat"></div>
+    <div class="input-row" id="input-row">
+      <input type="text" id="user-input" placeholder="Escribe tu respuesta..." />
+      <button id="send-btn" onclick="sendMsg()">Enviar →</button>
+    </div>
+  </div>
+  <div class="results-wrap" id="results"></div>
+</div>
+
+<!-- PÁGINA EMPRESAS -->
+<div class="page" id="page-biz">
+  <div class="section-wrap">
+    <div class="section-title">Llega a quien<br>ya quiere aprender</div>
+    <div class="section-sub">Tu academia aparece en las recomendaciones de IA a usuarios que acaban de descubrir su sector ideal. Leads cualificados, no tráfico frío.</div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-val">2.4k</div><div class="stat-lbl">usuarios/mes</div></div>
+      <div class="stat-box"><div class="stat-val">87%</div><div class="stat-lbl">completan el test</div></div>
+      <div class="stat-box"><div class="stat-val">12</div><div class="stat-lbl">sectores</div></div>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-box">
+        <div class="plan-name">Básico</div>
+        <div class="plan-price">199€ <span>/mes</span></div>
+        <div class="plan-desc">Aparece en 1 sector con badge de patrocinador y link directo.</div>
+        <div class="feat-list">
+          <div class="feat-item">1 sector laboral</div>
+          <div class="feat-item">Badge "Patrocinado"</div>
+          <div class="feat-item">Informe mensual</div>
+        </div>
+        <button class="plan-cta" onclick="contactar('Básico')">Empezar</button>
+      </div>
+      <div class="plan-box featured">
+        <div class="pop-tag">Más popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">499€ <span>/mes</span></div>
+        <div class="plan-desc">Primera posición en 3 sectores. La IA te recomienda como opción top.</div>
+        <div class="feat-list">
+          <div class="feat-item">3 sectores</div>
+          <div class="feat-item">Primera posición garantizada</div>
+          <div class="feat-item">Etiqueta "Top recomendado"</div>
+          <div class="feat-item">Stats en tiempo real</div>
+        </div>
+        <button class="plan-cta main" onclick="contactar('Pro')">Contratar Pro</button>
+      </div>
+      <div class="plan-box">
+        <div class="plan-name">Exclusivo</div>
+        <div class="plan-price">1.200€ <span>/mes</span></div>
+        <div class="plan-desc">Dominio completo de un sector. Sin competidores en esa categoría.</div>
+        <div class="feat-list">
+          <div class="feat-item">1 sector exclusivo</div>
+          <div class="feat-item">Sin competencia</div>
+          <div class="feat-item">Gestor dedicado</div>
+        </div>
+        <button class="plan-cta" onclick="contactar('Exclusivo')">Contactar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PÁGINA AFILIADOS -->
+<div class="page" id="page-aff">
+  <div class="section-wrap">
+    <div class="section-title">Gana por cada<br>recomendación</div>
+    <div class="section-sub">Cada curso que recomienda la IA lleva tu código de afiliado. Cobras automáticamente cuando alguien compra. Sin hacer nada extra.</div>
+    <div class="aff-list">
+      <div class="aff-row">
+        <div><div class="aff-name">Udemy</div><div class="aff-note">Pago mensual · mercado global</div></div>
+        <div class="aff-pct">15%</div>
+      </div>
+      <div class="aff-row">
+        <div><div class="aff-name">Platzi</div><div class="aff-note">Afiliado directo · España y LATAM</div></div>
+        <div class="aff-pct">20%</div>
+      </div>
+      <div class="aff-row">
+        <div><div class="aff-name">Coursera</div><div class="aff-note">Partner program · Internacional</div></div>
+        <div class="aff-pct">45%</div>
+      </div>
+      <div class="aff-row">
+        <div><div class="aff-name">Domestika</div><div class="aff-note">Red de afiliados · Fuerte en España</div></div>
+        <div class="aff-pct">25%</div>
+      </div>
+      <div class="aff-row">
+        <div><div class="aff-name">LinkedIn Learning</div><div class="aff-note">Referidos · Mercado profesional</div></div>
+        <div class="aff-pct">35%</div>
+      </div>
+    </div>
+    <div class="aff-bottom-note">Con 500 usuarios/mes y 8% de conversión → estimado 200–600€/mes solo en afiliados</div>
+    <button class="aff-register" onclick="alert('Regístrate en: udemy.com/affiliate · partners.coursera.org · platzi.com/afiliados · domestika.org/affiliates')">Ver cómo registrarme en cada plataforma →</button>
+  </div>
+</div>
+
+<footer>
+  SkillPath · Recomendación de cursos con IA · Gratis para usuarios · <a href="mailto:hola@skillpath.es" style="color: var(--accent); text-decoration: none;">hola@skillpath.es</a>
+</footer>
+
+<script>
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const API_KEY = 'PON_TU_API_KEY_AQUI';
+
+let lang = 'es';
+let answers = [];
+let qIdx = 0;
+let isLoading = false;
+let history = [];
+
+const TEXTS = {
+  es: {
+    placeholder: 'Escribe tu respuesta...',
+    send: 'Enviar →',
+    q1: '¡Hola! Voy a hacerte 5 preguntas rápidas para descubrir tu sector laboral ideal y los mejores cursos para ti.\n\n¿Qué actividades disfrutas o en las que sientes que eres bueno/a?',
+    restart: 'Volver a empezar',
+    sector_label: 'Tu sector ideal',
+    free: 'Gratuito',
+    sponsored: 'Patrocinado',
+    top: '⭐ Top recomendado',
+    earn_free: 'Comisión afiliado ~15-25%',
+    earn_sp: 'Patrocinador paga 499€/mes',
+    earn_top: 'Mayor comisión ~35%',
+    see_course: 'Ver curso →'
+  },
+  en: {
+    placeholder: 'Type your answer...',
+    send: 'Send →',
+    q1: 'Hi! I\'ll ask you 5 quick questions to discover your ideal career sector and the best courses for you.\n\nWhat activities do you enjoy or feel you\'re good at?',
+    restart: 'Start over',
+    sector_label: 'Your ideal sector',
+    free: 'Free',
+    sponsored: 'Sponsored',
+    top: '⭐ Top pick',
+    earn_free: 'Affiliate commission ~15-25%',
+    earn_sp: 'Sponsor pays €499/month',
+    earn_top: 'Higher commission ~35%',
+    see_course: 'See course →'
+  }
+};
+
+function setLang(l, btn) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('user-input').placeholder = TEXTS[l].placeholder;
+  document.getElementById('send-btn').textContent = TEXTS[l].send;
+}
+
+function showPage(p, btn) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  btn.classList.add('active');
+}
+
+function addBubble(text, type) {
+  const chat = document.getElementById('chat');
+  const b = document.createElement('div');
+  b.className = 'bubble ' + type;
+  b.textContent = text;
+  chat.appendChild(b);
+  chat.scrollTop = chat.scrollHeight;
+  return b;
+}
+
+function updateProgress(i) {
+  for (let x = 0; x <= 4; x++) {
+    const d = document.getElementById('p' + x);
+    if (d) d.className = 'prog-dot' + (x <= i ? ' on' : '');
+  }
+}
+
+async function callAPI(messages, system) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system, messages })
+  });
+  const data = await res.json();
+  return data.content.map(i => i.text || '').join('').trim();
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('user-input');
+  const btn = document.getElementById('send-btn');
+  const val = inp.value.trim();
+  if (!val || isLoading) return;
+
+  addBubble(val, 'user');
+  answers.push(val);
+  inp.value = '';
+  isLoading = true;
+  btn.disabled = true;
+  history.push({ role: 'user', content: val });
+
+  const lb = addBubble('...', 'ai loading');
+  updateProgress(qIdx + 1);
+  qIdx++;
+
+  if (qIdx < 5) {
+    const sys = `Eres un asesor de carrera empático. Llevas una entrevista de 5 preguntas para descubrir las cualidades del usuario. Ya has hecho ${qIdx} de 5. Haz la pregunta ${qIdx + 1} en ${lang === 'es' ? 'español' : 'English'}. Sé breve y natural.`;
+    const q = await callAPI(history, sys);
+    lb.textContent = q;
+    lb.className = 'bubble ai';
+    history.push({ role: 'assistant', content: q });
+  } else {
+    const sys = `Eres un asesor de carrera experto. Analiza las respuestas y devuelve SOLO JSON válido sin markdown:
+{"sector":"nombre","reason":"2 frases","courses":[
+{"name":"nombre","platform":"Udemy/Coursera/Platzi/Domestika","desc":"una frase","type":"free","url":"https://www.udemy.com"},
+{"name":"nombre","platform":"Platzi","desc":"una frase","type":"free","url":"https://platzi.com"},
+{"name":"nombre patrocinado","platform":"academia","desc":"una frase","type":"sponsored","url":"https://platzi.com"},
+{"name":"nombre TOP","platform":"LinkedIn Learning","desc":"el curso más transformador para este sector","type":"top","url":"https://www.linkedin.com/learning"}
+]}
+Idioma: ${lang === 'es' ? 'español' : 'English'}. Cursos relevantes para el sector detectado.`;
+    const all = answers.map((a, i) => `Respuesta ${i + 1}: ${a}`).join('\n');
+    const result = await callAPI([{ role: 'user', content: all }], sys);
+    lb.remove();
+    document.getElementById('input-row').style.display = 'none';
+    try {
+      const data = JSON.parse(result.replace(/```json|```/g, '').trim());
+      showResults(data);
+    } catch (e) {
+      addBubble('Hubo un error. Recarga la página e inténtalo de nuevo.', 'ai');
+    }
+  }
+
+  isLoading = false;
+  btn.disabled = false;
+  inp.focus();
+}
+
+function showResults(data) {
+  const T = TEXTS[lang];
+  const res = document.getElementById('results');
+  res.style.display = 'flex';
+
+  const sc = document.createElement('div');
+  sc.className = 'sector-card';
+  sc.innerHTML = `<div class="sector-label">${T.sector_label}</div><div class="sector-name">${data.sector}</div><div class="sector-reason">${data.reason}</div>`;
+  res.appendChild(sc);
+
+  data.courses.forEach(c => {
+    const card = document.createElement('div');
+    const isTop = c.type === 'top', isSp = c.type === 'sponsored';
+    card.className = 'course-card' + (isTop ? ' top' : isSp ? ' sponsored' : '');
+    const badge = isTop ? `<span class="badge top-b">${T.top}</span>` : isSp ? `<span class="badge sponsored-b">${T.sponsored}</span>` : `<span class="badge free">${T.free}</span>`;
+    const earn = isTop ? T.earn_top : isSp ? T.earn_sp : T.earn_free;
+    card.innerHTML = `${badge}<div class="course-name">${c.name}</div><div class="course-meta">${c.platform} · ${c.desc}</div><div class="course-earn">💰 ${earn}</div><a class="course-link" href="${c.url}" target="_blank">${T.see_course}</a>`;
+    res.appendChild(card);
+  });
+
+  const rb = document.createElement('button');
+  rb.className = 'restart-btn';
+  rb.textContent = T.restart;
+  rb.onclick = () => location.reload();
+  res.appendChild(rb);
+}
+
+function contactar(plan) {
+  const email = 'hola@skillpath.es';
+  window.location.href = `mailto:${email}?subject=Interesado en plan ${plan}&body=Hola, me interesa el plan ${plan} para mi academia. ¿Podemos hablar?`;
+}
+
+document.getElementById('user-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendMsg();
+});
+
+const q1 = TEXTS[lang].q1;
+addBubble(q1, 'ai');
+history.push({ role: 'assistant', content: q1 });
+</script>
+</body>
+</html>
