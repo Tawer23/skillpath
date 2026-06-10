@@ -515,8 +515,7 @@
 </footer>
 
 <script>
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const API_KEY = 'PON_TU_API_KEY_AQUI';
+const API_URL = '/api/chat';
 
 let lang = 'es';
 let answers = [];
@@ -590,8 +589,8 @@ function updateProgress(i) {
 async function callAPI(messages, system) {
   const res = await fetch(API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system, messages })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, system })
   });
   const data = await res.json();
   return data.content.map(i => i.text || '').join('').trim();
