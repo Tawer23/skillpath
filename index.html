@@ -593,6 +593,9 @@ async function callAPI(messages, system) {
     body: JSON.stringify({ messages, system })
   });
   const data = await res.json();
+  if (!res.ok || !data.content) {
+    throw new Error('ERROR API: ' + JSON.stringify(data).slice(0, 300));
+  }
   return data.content.map(i => i.text || '').join('').trim();
 }
 
@@ -615,10 +618,15 @@ async function sendMsg() {
 
   if (qIdx < 5) {
     const sys = `Eres un asesor de carrera empático. Llevas una entrevista de 5 preguntas para descubrir las cualidades del usuario. Ya has hecho ${qIdx} de 5. Haz la pregunta ${qIdx + 1} en ${lang === 'es' ? 'español' : 'English'}. Sé breve y natural.`;
-    const q = await callAPI(history, sys);
-    lb.textContent = q;
-    lb.className = 'bubble ai';
-    history.push({ role: 'assistant', content: q });
+    try {
+      const q = await callAPI(history, sys);
+      lb.textContent = q;
+      lb.className = 'bubble ai';
+      history.push({ role: 'assistant', content: q });
+    } catch (err) {
+      lb.textContent = err.message;
+      lb.className = 'bubble ai';
+    }
   } else {
     const sys = `Eres un asesor de carrera experto. Analiza las respuestas y devuelve SOLO JSON válido sin markdown:
 {"sector":"nombre","reason":"2 frases","courses":[
@@ -629,14 +637,15 @@ async function sendMsg() {
 ]}
 Idioma: ${lang === 'es' ? 'español' : 'English'}. Cursos relevantes para el sector detectado.`;
     const all = answers.map((a, i) => `Respuesta ${i + 1}: ${a}`).join('\n');
-    const result = await callAPI([{ role: 'user', content: all }], sys);
-    lb.remove();
-    document.getElementById('input-row').style.display = 'none';
     try {
+      const result = await callAPI([{ role: 'user', content: all }], sys);
+      lb.remove();
+      document.getElementById('input-row').style.display = 'none';
       const data = JSON.parse(result.replace(/```json|```/g, '').trim());
       showResults(data);
-    } catch (e) {
-      addBubble('Hubo un error. Recarga la página e inténtalo de nuevo.', 'ai');
+    } catch (err) {
+      lb.textContent = err.message;
+      lb.className = 'bubble ai';
     }
   }
 
